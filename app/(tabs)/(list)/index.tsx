@@ -14,7 +14,7 @@ export default function ListScreen() {
       <SafeAreaView style={styles.container}>
         {/* 列表头部 */}
         <ListHeader />
-        <View style={{ marginTop: 0, width: 300, alignSelf: "center" }}>
+        <View style={{ marginTop: 10, width: 300, alignSelf: "center" }}>
           <ListStatusTable />
         </View>
 

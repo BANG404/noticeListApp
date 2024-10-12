@@ -4,7 +4,6 @@ import { Box, VStack, FormControl, Input, TextArea, Button } from "native-base";
 export default function DomainDetail({ route, navigation }) {
   const [domain, setDomain] = useState({
     name: "",
-    url: "",
     notes: "",
   });
 
@@ -29,14 +28,6 @@ export default function DomainDetail({ route, navigation }) {
             bg="white"
             value={domain.name}
             onChangeText={(value) => setDomain({ ...domain, name: value })}
-          />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label>Domain URL</FormControl.Label>
-          <Input
-            bg="white"
-            value={domain.url}
-            onChangeText={(value) => setDomain({ ...domain, url: value })}
           />
         </FormControl>
         <FormControl>

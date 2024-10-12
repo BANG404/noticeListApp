@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FlatList } from 'react-native';
-import { Box, Text, VStack, HStack, Spacer, IconButton, AddIcon, DeleteIcon, Pressable } from 'native-base';
+import { Box, Text, VStack, HStack, Spacer, IconButton, AddIcon, DeleteIcon, Pressable, Badge } from 'native-base';
 
 const initialNotifications = [
   { id: '1', name: 'John Doe', title: 'Mr.', content: 'Meeting at 2 PM', domain: 'Work', time: '2023-05-20 10:00', deadline: '2023-05-20 14:00', tag: 'Important' },
@@ -16,20 +16,38 @@ export default function NotificationsScreen({ navigation }) {
 
   const renderItem = ({ item }) => (
     <Pressable onPress={() => navigation.navigate('NotificationDetail', { notification: item })}>
-      <Box borderBottomWidth="1" borderColor="primary.100" pl={["0", "4"]} pr={["0", "5"]} py="2">
-        <HStack space={[2, 3]} justifyContent="space-between">
+      <Box 
+        borderBottomWidth="1" 
+        borderColor="coolGray.200" 
+        pl="4" 
+        pr="5" 
+        py="2"
+        bg="white"
+        shadow={1}
+        rounded="lg"
+        my={1}
+        mx={2}
+      >
+        <HStack space={3} justifyContent="space-between">
           <VStack>
-            <Text color="primary.500" bold>
+            <Text color="coolGray.800" bold>
               {item.name} ({item.title})
             </Text>
-            <Text color="primary.900">{item.content}</Text>
-            <Text fontSize="xs" color="primary.500">
-              {item.time} - {item.domain}
+            <Text color="coolGray.600" mt={1}>
+              {item.content}
             </Text>
+            <HStack alignItems="center" space={2} mt={2}>
+              <Badge colorScheme={item.tag === 'Important' ? 'red' : 'orange'} variant="subtle" rounded="full">
+                {item.tag}
+              </Badge>
+              <Text fontSize="xs" color="coolGray.500">
+                {item.time} - {item.domain}
+              </Text>
+            </HStack>
           </VStack>
           <Spacer />
           <IconButton
-            icon={<DeleteIcon size="sm" />}
+            icon={<DeleteIcon size="sm" color="coolGray.500" />}
             onPress={() => deleteNotification(item.id)}
           />
         </HStack>
@@ -38,21 +56,14 @@ export default function NotificationsScreen({ navigation }) {
   );
 
   return (
-    <Box bg="primary.50" flex={1}>
+    <Box bg="coolGray.100" flex={1}>
       <FlatList
         data={notifications}
         renderItem={renderItem}
         keyExtractor={item => item.id}
+        contentContainerStyle={{ paddingVertical: 10 }}
       />
-      <IconButton
-        icon={<AddIcon />}
-        onPress={() => navigation.navigate('NotificationDetail')}
-        position="absolute"
-        bottom={4}
-        right={4}
-        bg="primary.500"
-        rounded="full"
-      />
+      
     </Box>
   );
 }

@@ -1,98 +1,220 @@
-import React, { useState, useEffect } from 'react';
-import { Box, VStack, FormControl, Input, TextArea, Select, Button } from 'native-base';
+import React, { useState } from "react";
+import {
+  NativeBaseProvider,
+  extendTheme,
+  Box,
+  ScrollView,
+  VStack,
+  Heading,
+  FormControl,
+  TextArea,
+  Input,
+  Button,
+  HStack,
+  Text,
+  Pressable,
+  Select,
+  CheckIcon,
+} from "native-base";
 
-export default function NotificationDetailScreen({ route, navigation }) {
-  const [notification, setNotification] = useState({
-    name: '',
-    title: '',
-    content: '',
-    domain: '',
-    time: '',
-    deadline: '',
-    tag: '',
-  });
+const customTheme = extendTheme({
+  colors: {
+    primary: {
+      50: "#f4f4f5",
+      100: "#e4e4e7",
+      500: "#71717a",
+      600: "#52525b",
+    },
+  },
+});
 
-  useEffect(() => {
-    if (route.params?.notification) {
-      setNotification(route.params.notification);
+const domains = [
+  { value: "marketing", label: "市场营销" },
+  { value: "sales", label: "销售" },
+  { value: "engineering", label: "工程" },
+  { value: "hr", label: "人力资源" },
+  { value: "finance", label: "财务" },
+];
+
+const deadlines = ["1天", "3天", "1周", "2周", "1个月"];
+
+export default function NotificationPublisherScreen() {
+  const [content, setContent] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedDomain, setSelectedDomain] = useState("");
+  const [selectedDeadline, setSelectedDeadline] = useState("");
+  const [tags, setTags] = useState<string[]>(["重要", "紧急", "常规"]);
+  const [newTag, setNewTag] = useState("");
+
+  const handleSubmit = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log(
+      "通知已发布",
+      `通知已成功发送到 ${selectedDomain} 域。`
+    );
+    setContent("");
+    setSelectedTags([]);
+    setSelectedDomain("");
+    setSelectedDeadline("");
+  };
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const addNewTag = () => {
+    if (newTag && !tags.includes(newTag)) {
+      setTags([...tags, newTag]);
+      setNewTag("");
     }
-  }, [route.params?.notification]);
+  };
 
-  const handleSave = () => {
-    // Here you would typically save the notification to your backend or local storage
-    console.log('Saving notification:', notification);
-    navigation.goBack();
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+    setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
   };
 
   return (
-    <Box bg="primary.50" flex={1} p={4}>
-      <VStack space={4}>
-        <FormControl>
-          <FormControl.Label>Name</FormControl.Label>
-          <Input
-            bg="white"
-            value={notification.name}
-            onChangeText={(value) => setNotification({ ...notification, name: value })}
-          />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label>Title</FormControl.Label>
-          <Input
-            bg="white"
-            value={notification.title}
-            onChangeText={(value) => setNotification({ ...notification, title: value })}
-          />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label>Content</FormControl.Label>
-          <TextArea
-            bg="white"
-            value={notification.content}
-            onChangeText={(value) => setNotification({ ...notification, content: value })}
-            h={20}
-            autoCompleteType="off" // 添加此行
-          />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label>Domain</FormControl.Label>
-          <Input
-            bg="white"
-            value={notification.domain}
-            onChangeText={(value) => setNotification({ ...notification, domain: value })}
-          />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label>Time</FormControl.Label>
-          <Input
-            bg="white"
-            value={notification.time}
-            onChangeText={(value) => setNotification({ ...notification, time: value })}
-          />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label>Deadline (Optional)</FormControl.Label>
-          <Input
-            bg="white"
-            value={notification.deadline}
-            onChangeText={(value) => setNotification({ ...notification, deadline: value })}
-          />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label>Tag</FormControl.Label>
-          <Select
-            bg="white"
-            selectedValue={notification.tag}
-            onValueChange={(value) => setNotification({ ...notification, tag: value })}
-          >
-            <Select.Item label="Important" value="Important" />
-            <Select.Item label="Urgent" value="Urgent" />
-            <Select.Item label="Normal" value="Normal" />
-          </Select>
-        </FormControl>
-        <Button onPress={handleSave} bg="primary.500">
-          Save
-        </Button>
-      </VStack>
-    </Box>
+    <NativeBaseProvider theme={customTheme}>
+      <Box flex={1} bg="primary.50" safeArea>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <VStack space={6} p={6}>
+            <Heading size="xl" fontWeight="bold" color="primary.600">
+              修改通知
+            </Heading>
+
+            <FormControl>
+              <FormControl.Label _text={{ fontWeight: "bold", color: "primary.600" }}>
+                通知内容
+              </FormControl.Label>
+              <TextArea
+                h={32}
+                placeholder="输入通知内容"
+                value={content}
+                onChangeText={setContent}
+                bg="white"
+                borderColor="primary.100"
+                _focus={{ borderColor: "primary.500" }}
+                autoCompleteType={undefined}
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormControl.Label _text={{ fontWeight: "bold", color: "primary.600" }}>
+                标签
+              </FormControl.Label>
+              <HStack flexWrap="wrap" space={2} mb={2}>
+                {tags.map((tag) => (
+                  <Pressable key={tag} onPress={() => toggleTag(tag)}>
+                    <Box
+                      bg={selectedTags.includes(tag) ? "primary.500" : "primary.100"}
+                      px={3}
+                      py={1}
+                      borderRadius="full"
+                      mb={2}
+                    >
+                      <HStack space={2} alignItems="center">
+                        <Text color={selectedTags.includes(tag) ? "white" : "primary.600"}>
+                          {tag}
+                        </Text>
+                        <Pressable onPress={() => removeTag(tag)}>
+                          <Text color={selectedTags.includes(tag) ? "white" : "primary.600"}>✕</Text>
+                        </Pressable>
+                      </HStack>
+                    </Box>
+                  </Pressable>
+                ))}
+              </HStack>
+              <HStack space={2}>
+                <Input
+                  flex={1}
+                  placeholder="添加新标签"
+                  value={newTag}
+                  onChangeText={setNewTag}
+                  bg="white"
+                  borderColor="primary.100"
+                  _focus={{ borderColor: "primary.500" }}
+                />
+                <Button
+                  onPress={addNewTag}
+                  bg="primary.600"
+                  _pressed={{ bg: "primary.500" }}
+                >
+                  添加
+                </Button>
+              </HStack>
+            </FormControl>
+
+            <FormControl>
+              <FormControl.Label _text={{ fontWeight: "bold", color: "primary.600" }}>
+                发送域
+              </FormControl.Label>
+              <Select
+                selectedValue={selectedDomain}
+                minWidth="200"
+                accessibilityLabel="选择发送域"
+                placeholder="选择发送域"
+                bg="white"
+                borderColor="primary.100"
+                _selectedItem={{
+                  bg: "primary.100",
+                  endIcon: <CheckIcon size="5" color="primary.600" />,
+                }}
+                onValueChange={setSelectedDomain}
+              >
+                {domains.map((domain) => (
+                  <Select.Item
+                    key={domain.value}
+                    label={domain.label}
+                    value={domain.value}
+                  />
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl>
+              <FormControl.Label _text={{ fontWeight: "bold", color: "primary.600" }}>
+                截止时间
+              </FormControl.Label>
+              <Select
+                selectedValue={selectedDeadline}
+                minWidth="200"
+                accessibilityLabel="选择截止时间"
+                placeholder="选择截止时间"
+                bg="white"
+                borderColor="primary.100"
+                _selectedItem={{
+                  bg: "primary.100",
+                  endIcon: <CheckIcon size="5" color="primary.600" />,
+                }}
+                onValueChange={setSelectedDeadline}
+              >
+                {deadlines.map((deadline) => (
+                  <Select.Item
+                    key={deadline}
+                    label={deadline}
+                    value={deadline}
+                  />
+                ))}
+              </Select>
+            </FormControl>
+
+
+            <Button
+              onPress={handleSubmit}
+              mt={4}
+              bg="primary.600"
+              _pressed={{ bg: "primary.500" }}
+            >
+              <Text>发布通知</Text>
+            </Button>
+          </VStack>
+        </ScrollView>
+      </Box>
+    </NativeBaseProvider>
   );
 }
