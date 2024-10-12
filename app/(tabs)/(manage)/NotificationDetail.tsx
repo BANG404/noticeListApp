@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   NativeBaseProvider,
   extendTheme,
@@ -16,6 +16,9 @@ import {
   Select,
   CheckIcon,
 } from "native-base";
+import TagEdit from "../../../components/tag_edit";
+import DomainSelect from "../../../components/domain_select";
+import DeadlinePicker from "../../../components/deadLine";
 
 const customTheme = extendTheme({
   colors: {
@@ -35,8 +38,7 @@ const domains = [
   { value: "hr", label: "人力资源" },
   { value: "finance", label: "财务" },
 ];
-
-const deadlines = ["1天", "3天", "1周", "2周", "1个月"];
+const [targetDate, setTargetDate] = useState(new Date()); // 确保初始值是有效的日期对象
 
 export default function NotificationPublisherScreen() {
   const [content, setContent] = useState("");
@@ -44,26 +46,54 @@ export default function NotificationPublisherScreen() {
   const [selectedDomain, setSelectedDomain] = useState("");
   const [selectedDeadline, setSelectedDeadline] = useState("");
   const [tags, setTags] = useState<string[]>(["重要", "紧急", "常规"]);
+  const [domainQuery, setDomainQuery] = useState("");
   const [newTag, setNewTag] = useState("");
+  const [availableDomains, setAvailableDomains] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  // 模拟从数据库获取域的函数
+  const fetchDomains = async (query: string) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const allDomains = [
+      { value: "marketing", label: "市场营销" },
+      { value: "sales", label: "销售" },
+      { value: "engineering", label: "工程" },
+      { value: "hr", label: "人力资源" },
+      { value: "finance", label: "财务" },
+      { value: "customer_service", label: "客户服务" },
+      { value: "product", label: "产品" },
+      { value: "design", label: "设计" },
+    ];
+    return allDomains.filter(
+      (domain) =>
+        domain.label.toLowerCase().includes(query.toLowerCase()) ||
+        domain.value.toLowerCase().includes(query.toLowerCase())
+    );
+  };
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      fetchDomains(domainQuery).then(setAvailableDomains);
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [domainQuery]);
+
+  const toggleDomain = (domain: string) => {
+    setSelectedDomains((prevDomains) =>
+      prevDomains.includes(domain)
+        ? prevDomains.filter((d) => d !== domain)
+        : [...prevDomains, domain]
+    );
+  };
 
   const handleSubmit = async () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log(
-      "通知已发布",
-      `通知已成功发送到 ${selectedDomain} 域。`
-    );
+    console.log("通知已发布", `通知已成功发送到 ${selectedDomain} 域。`);
     setContent("");
     setSelectedTags([]);
     setSelectedDomain("");
     setSelectedDeadline("");
-  };
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
   };
 
   const addNewTag = () => {
@@ -74,8 +104,8 @@ export default function NotificationPublisherScreen() {
   };
 
   const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
-    setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+    setSelectedTags(selectedTags.filter((tag) => tag !== tagToRemove));
   };
 
   return (
@@ -88,7 +118,9 @@ export default function NotificationPublisherScreen() {
             </Heading>
 
             <FormControl>
-              <FormControl.Label _text={{ fontWeight: "bold", color: "primary.600" }}>
+              <FormControl.Label
+                _text={{ fontWeight: "bold", color: "primary.600" }}
+              >
                 通知内容
               </FormControl.Label>
               <TextArea
@@ -103,106 +135,23 @@ export default function NotificationPublisherScreen() {
               />
             </FormControl>
 
-            <FormControl>
-              <FormControl.Label _text={{ fontWeight: "bold", color: "primary.600" }}>
-                标签
-              </FormControl.Label>
-              <HStack flexWrap="wrap" space={2} mb={2}>
-                {tags.map((tag) => (
-                  <Pressable key={tag} onPress={() => toggleTag(tag)}>
-                    <Box
-                      bg={selectedTags.includes(tag) ? "primary.500" : "primary.100"}
-                      px={3}
-                      py={1}
-                      borderRadius="full"
-                      mb={2}
-                    >
-                      <HStack space={2} alignItems="center">
-                        <Text color={selectedTags.includes(tag) ? "white" : "primary.600"}>
-                          {tag}
-                        </Text>
-                        <Pressable onPress={() => removeTag(tag)}>
-                          <Text color={selectedTags.includes(tag) ? "white" : "primary.600"}>✕</Text>
-                        </Pressable>
-                      </HStack>
-                    </Box>
-                  </Pressable>
-                ))}
-              </HStack>
-              <HStack space={2}>
-                <Input
-                  flex={1}
-                  placeholder="添加新标签"
-                  value={newTag}
-                  onChangeText={setNewTag}
-                  bg="white"
-                  borderColor="primary.100"
-                  _focus={{ borderColor: "primary.500" }}
-                />
-                <Button
-                  onPress={addNewTag}
-                  bg="primary.600"
-                  _pressed={{ bg: "primary.500" }}
-                >
-                  添加
-                </Button>
-              </HStack>
-            </FormControl>
+            <DeadlinePicker value={targetDate} onChange={setTargetDate} />
+            <TagEdit
+              tags={tags}
+              selectedTags={selectedTags}
+              newTag={newTag}
+              setNewTag={setNewTag}
+              addNewTag={addNewTag}
+              removeTag={removeTag}
+            />
 
-            <FormControl>
-              <FormControl.Label _text={{ fontWeight: "bold", color: "primary.600" }}>
-                发送域
-              </FormControl.Label>
-              <Select
-                selectedValue={selectedDomain}
-                minWidth="200"
-                accessibilityLabel="选择发送域"
-                placeholder="选择发送域"
-                bg="white"
-                borderColor="primary.100"
-                _selectedItem={{
-                  bg: "primary.100",
-                  endIcon: <CheckIcon size="5" color="primary.600" />,
-                }}
-                onValueChange={setSelectedDomain}
-              >
-                {domains.map((domain) => (
-                  <Select.Item
-                    key={domain.value}
-                    label={domain.label}
-                    value={domain.value}
-                  />
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl>
-              <FormControl.Label _text={{ fontWeight: "bold", color: "primary.600" }}>
-                截止时间
-              </FormControl.Label>
-              <Select
-                selectedValue={selectedDeadline}
-                minWidth="200"
-                accessibilityLabel="选择截止时间"
-                placeholder="选择截止时间"
-                bg="white"
-                borderColor="primary.100"
-                _selectedItem={{
-                  bg: "primary.100",
-                  endIcon: <CheckIcon size="5" color="primary.600" />,
-                }}
-                onValueChange={setSelectedDeadline}
-              >
-                {deadlines.map((deadline) => (
-                  <Select.Item
-                    key={deadline}
-                    label={deadline}
-                    value={deadline}
-                  />
-                ))}
-              </Select>
-            </FormControl>
-
+            <DomainSelect
+              domainQuery={domainQuery}
+              setDomainQuery={setDomainQuery}
+              availableDomains={availableDomains}
+              selectedDomains={selectedDomains}
+              toggleDomain={toggleDomain}
+            />
 
             <Button
               onPress={handleSubmit}

@@ -1,22 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { NativeBaseProvider, extendTheme, Box, ScrollView, VStack, Heading, FormControl, TextArea, Input, Button, HStack, Text, Pressable, FlatList, IconButton } from 'native-base';
-import { Ionicons } from '@expo/vector-icons';
-
-
+import React, { useState, useEffect } from "react";
+import {
+  NativeBaseProvider,
+  extendTheme,
+  Box,
+  ScrollView,
+  VStack,
+  Heading,
+  FormControl,
+  TextArea,
+  Input,
+  Button,
+  HStack,
+  Text,
+  Pressable,
+  FlatList,
+  IconButton,
+} from "native-base";
+import { Ionicons } from "@expo/vector-icons";
+import TagEdit from "../../../components/tag_edit";
+import DomainSelect from "../../../components/domain_select";
 const customTheme = extendTheme({
   colors: {
     primary: {
-      50: '#f4f4f5',
-      100: '#e4e4e7',
-      500: '#71717a',
-      600: '#52525b',
+      50: "#f4f4f5",
+      100: "#e4e4e7",
+      500: "#71717a",
+      600: "#52525b",
     },
   },
 });
 
 // 模拟从数据库获取域的函数
 const fetchDomains = async (query: string) => {
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 500));
   const allDomains = [
     { value: "marketing", label: "市场营销" },
     { value: "sales", label: "销售" },
@@ -27,21 +43,25 @@ const fetchDomains = async (query: string) => {
     { value: "product", label: "产品" },
     { value: "design", label: "设计" },
   ];
-  return allDomains.filter(domain => 
-    domain.label.toLowerCase().includes(query.toLowerCase()) ||
-    domain.value.toLowerCase().includes(query.toLowerCase())
+  return allDomains.filter(
+    (domain) =>
+      domain.label.toLowerCase().includes(query.toLowerCase()) ||
+      domain.value.toLowerCase().includes(query.toLowerCase())
   );
 };
 
 const predefinedTags = ["重要", "紧急", "公告", "活动", "提醒"];
 
 export default function NotificationPublisherScreen() {
-  const [content, setContent] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState('');
+  const [newTag, setNewTag] = useState("");
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
-  const [domainQuery, setDomainQuery] = useState('');
-  const [availableDomains, setAvailableDomains] = useState<{value: string, label: string}[]>([]);
+  const [domainQuery, setDomainQuery] = useState("");
+  const [availableDomains, setAvailableDomains] = useState<
+    { value: string; label: string }[]
+  >([]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -51,10 +71,20 @@ export default function NotificationPublisherScreen() {
     return () => clearTimeout(delayDebounceFn);
   }, [domainQuery]);
 
+  const addNewTag = () => {
+    if (newTag && !tags.includes(newTag)) {
+      setTags([...tags, newTag]);
+      setNewTag("");
+    }
+  };
+
   const handleSubmit = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log("通知已发布", `通知已成功发送到 ${selectedDomains.join(', ')} 域。`);
-    setContent('');
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log(
+      "通知已发布",
+      `通知已成功发送到 ${selectedDomains.join(", ")} 域。`
+    );
+    setContent("");
     setTags([]);
     setSelectedDomains([]);
   };
@@ -62,26 +92,26 @@ export default function NotificationPublisherScreen() {
   const addTag = () => {
     if (newTag && !tags.includes(newTag)) {
       setTags([...tags, newTag]);
-      setNewTag('');
+      setNewTag("");
     }
   };
 
   const removeTag = (tag: string) => {
-    setTags(tags.filter(t => t !== tag));
+    setTags(tags.filter((t) => t !== tag));
   };
 
   const togglePredefinedTag = (tag: string) => {
-    setTags(prevTags => 
+    setTags((prevTags) =>
       prevTags.includes(tag)
-        ? prevTags.filter(t => t !== tag)
+        ? prevTags.filter((t) => t !== tag)
         : [...prevTags, tag]
     );
   };
 
   const toggleDomain = (domain: string) => {
-    setSelectedDomains(prevDomains => 
+    setSelectedDomains((prevDomains) =>
       prevDomains.includes(domain)
-        ? prevDomains.filter(d => d !== domain)
+        ? prevDomains.filter((d) => d !== domain)
         : [...prevDomains, domain]
     );
   };
@@ -96,7 +126,11 @@ export default function NotificationPublisherScreen() {
             </Heading>
 
             <FormControl>
-              <FormControl.Label _text={{ fontWeight: "bold", color: "primary.600" }}>通知内容</FormControl.Label>
+              <FormControl.Label
+                _text={{ fontWeight: "bold", color: "primary.600" }}
+              >
+                通知内容
+              </FormControl.Label>
               <TextArea
                 h={32}
                 placeholder="输入通知内容"
@@ -109,10 +143,22 @@ export default function NotificationPublisherScreen() {
               />
             </FormControl>
 
-            <FormControl>
-              <FormControl.Label _text={{ fontWeight: "bold", color: "primary.600" }}>标签</FormControl.Label>
+            <TagEdit
+              tags={tags}
+              selectedTags={selectedTags}
+              newTag={newTag}
+              setNewTag={setNewTag}
+              addNewTag={addNewTag}
+              removeTag={removeTag}
+            />
+            {/* <FormControl>
+              <FormControl.Label
+                _text={{ fontWeight: "bold", color: "primary.600" }}
+              >
+                标签
+              </FormControl.Label>
               <HStack flexWrap="wrap" space={2} mb={2}>
-                {predefinedTags.map(tag => (
+                {predefinedTags.map((tag) => (
                   <Pressable
                     key={tag}
                     onPress={() => togglePredefinedTag(tag)}
@@ -121,7 +167,9 @@ export default function NotificationPublisherScreen() {
                     py={1}
                     borderRadius="full"
                   >
-                    <Text color={tags.includes(tag) ? "white" : "primary.600"}>{tag}</Text>
+                    <Text color={tags.includes(tag) ? "white" : "primary.600"}>
+                      {tag}
+                    </Text>
                   </Pressable>
                 ))}
               </HStack>
@@ -144,7 +192,7 @@ export default function NotificationPublisherScreen() {
                 />
               </HStack>
               <HStack flexWrap="wrap" space={2}>
-                {tags.map(tag => (
+                {tags.map((tag) => (
                   <Pressable
                     key={tag}
                     onPress={() => removeTag(tag)}
@@ -155,15 +203,21 @@ export default function NotificationPublisherScreen() {
                     flexDirection="row"
                     alignItems="center"
                   >
-                    <Text color="white" mr={1}>{tag}</Text>
+                    <Text color="white" mr={1}>
+                      {tag}
+                    </Text>
                     <Ionicons name="close" size={16} color="white" />
                   </Pressable>
                 ))}
               </HStack>
-            </FormControl>
+            </FormControl> */}
 
-            <FormControl>
-              <FormControl.Label _text={{ fontWeight: "bold", color: "primary.600" }}>发送域</FormControl.Label>
+            {/* <FormControl>
+              <FormControl.Label
+                _text={{ fontWeight: "bold", color: "primary.600" }}
+              >
+                发送域
+              </FormControl.Label>
               <Input
                 placeholder="搜索发送域"
                 value={domainQuery}
@@ -176,9 +230,13 @@ export default function NotificationPublisherScreen() {
               <FlatList
                 data={availableDomains}
                 renderItem={({ item }) => (
-                  <Pressable 
+                  <Pressable
                     onPress={() => toggleDomain(item.value)}
-                    bg={selectedDomains.includes(item.value) ? "primary.100" : "white"}
+                    bg={
+                      selectedDomains.includes(item.value)
+                        ? "primary.100"
+                        : "white"
+                    }
                     p={2}
                     mb={1}
                     borderRadius="md"
@@ -186,30 +244,44 @@ export default function NotificationPublisherScreen() {
                     <Text color="primary.600">{item.label}</Text>
                   </Pressable>
                 )}
-                keyExtractor={item => item.value}
+                keyExtractor={(item) => item.value}
                 maxH={150}
               />
               <HStack flexWrap="wrap" space={2} mt={2}>
-                {selectedDomains.map(domain => (
-                  <Pressable 
-                    key={domain} 
+                {selectedDomains.map((domain) => (
+                  <Pressable
+                    key={domain}
                     onPress={() => toggleDomain(domain)}
                     _pressed={{ opacity: 0.5 }}
                   >
-                    <Box bg="primary.100" px={3} py={1} borderRadius="full" mb={2}>
+                    <Box
+                      bg="primary.100"
+                      px={3}
+                      py={1}
+                      borderRadius="full"
+                      mb={2}
+                    >
                       <Text color="primary.600">
-                        {availableDomains.find(d => d.value === domain)?.label || domain} ✕
+                        {availableDomains.find((d) => d.value === domain)
+                          ?.label || domain}{" "}
+                        ✕
                       </Text>
                     </Box>
                   </Pressable>
                 ))}
               </HStack>
-            </FormControl>
-
-            <Button 
-              onPress={handleSubmit} 
-              mt={4} 
-              bg="primary.600" 
+            </FormControl> */}
+            <DomainSelect
+              domainQuery={domainQuery}
+              setDomainQuery={setDomainQuery}
+              availableDomains={availableDomains}
+              selectedDomains={selectedDomains}
+              toggleDomain={toggleDomain}
+            />
+            <Button
+              onPress={handleSubmit}
+              mt={4}
+              bg="primary.600"
               _pressed={{ bg: "primary.500" }}
             >
               发布通知

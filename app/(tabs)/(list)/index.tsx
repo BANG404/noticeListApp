@@ -1,4 +1,3 @@
-import { Link } from "expo-router";
 import { Text, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ListHeader from "../../../components/list_header";

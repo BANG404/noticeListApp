@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
-import { FlatList } from 'react-native';
-import { Box, Text, VStack, HStack, Spacer, IconButton, AddIcon, DeleteIcon, Pressable } from 'native-base';
+import React, { useState } from "react";
+import { FlatList } from "react-native";
+import {
+  Box,
+  Text,
+  VStack,
+  HStack,
+  Spacer,
+  IconButton,
+  AddIcon,
+  DeleteIcon,
+  Pressable,
+} from "native-base";
 
 const initialDomains = [
-  { id: '1', name: 'Work', notes: 'Company domain' },
-  { id: '2', name: 'Personal', notes: 'Personal projects' },
+  { id: "1", name: "Work", notes: "Company domain" },
+  { id: "2", name: "Personal", notes: "Personal projects" },
 ];
 
 export default function DomainsScreen({ navigation }) {
@@ -15,7 +25,9 @@ export default function DomainsScreen({ navigation }) {
   };
 
   const renderItem = ({ item }) => (
-    <Pressable onPress={() => navigation.navigate('DomainDetail', { domain: item })}>
+    <Pressable
+      onPress={() => navigation.navigate("DomainDetail", { domain: item })}
+    >
       <Box
         borderBottomWidth="1"
         borderColor="coolGray.200"
@@ -48,7 +60,7 @@ export default function DomainsScreen({ navigation }) {
   );
 
   return (
-    <Box bg="coolGray.100" flex={1} > 
+    <Box bg="coolGray.100" flex={1}>
       <FlatList
         data={domains}
         renderItem={renderItem}
@@ -57,7 +69,7 @@ export default function DomainsScreen({ navigation }) {
       />
       <IconButton
         icon={<AddIcon />}
-        onPress={() => navigation.navigate('DomainDetail')}
+        onPress={() => navigation.navigate("DomainDetail")}
         position="absolute"
         bottom={8}
         right={8}

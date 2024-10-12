@@ -114,7 +114,7 @@ export default function App() {
                 iconName = focused ? 'globe' : 'globe-outline';
               }
 
-              return <Ionicons name={iconName} size={size} color={color} />;
+              return <Ionicons name={iconName} size={size} color={color} tintColor={color} />; // 添加 tintColor 属性
             },
             tabBarActiveTintColor: theme.colors.primary[600],
             tabBarInactiveTintColor: 'gray',
