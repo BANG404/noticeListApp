@@ -31,7 +31,6 @@ export default function DomainSelect({
           mb={2}
         />
         <FlatList
-        
           data={availableDomains}
           renderItem={({ item }) => (
             <Pressable
@@ -48,6 +47,8 @@ export default function DomainSelect({
           )}
           keyExtractor={(item) => item.value}
           maxH={150}
+          nestedScrollEnabled // 启用嵌套滚动
+          scrollEnabled={true} // 确保滚动已启用
         />
         <HStack flexWrap="wrap" space={2} mt={2}>
           {selectedDomains.map((domain) => (

@@ -13,7 +13,7 @@ import {
 } from "native-base";
 
 const initialDomains = [
-  { id: "1", name: "Work", notes: "Company domain" },
+  { id: "1", name: "Work", notes: "Company domain" ,shareCode:'112'},
   { id: "2", name: "Personal", notes: "Personal projects" },
 ];
 
@@ -73,7 +73,7 @@ export default function DomainsScreen({ navigation }) {
         position="absolute"
         bottom={8}
         right={8}
-        bg="primary.600"
+        bg="white"
         rounded="full"
         shadow={2}
         size="lg"

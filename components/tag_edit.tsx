@@ -28,6 +28,7 @@ export default function TagEdit({
         <HStack flexWrap="wrap" space={2} mb={2}>
           {tags.map((tag) => (
             <Box
+              key={tag}
               bg={selectedTags.includes(tag) ? "primary.500" : "primary.100"}
               px={3}
               py={1}

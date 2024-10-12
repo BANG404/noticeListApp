@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
 
-export default function StatusTabs() {
+export default function StatusTabs({ onTabChange }) {
   const [activeTab, setActiveTab] = useState('待完成');
 
   const tabs = [
@@ -9,6 +9,11 @@ export default function StatusTabs() {
     { key: '过期', label: '过期' },
     { key: '已完成', label: '已完成' },
   ];
+
+  const handleTabPress = (tabKey) => {
+    setActiveTab(tabKey);
+    onTabChange(tabKey);
+  };
 
   return (
     <View style={styles.container}>
@@ -19,7 +24,7 @@ export default function StatusTabs() {
             styles.tab,
             activeTab === tab.key && styles.activeTab
           ]}
-          onPress={() => setActiveTab(tab.key)}
+          onPress={() => handleTabPress(tab.key)}
         >
           <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>
             {tab.label}
@@ -29,7 +34,6 @@ export default function StatusTabs() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',

@@ -8,6 +8,7 @@ import NotificationsScreen from './Notifications';
 import DomainsScreen from './Domains';
 import NotificationDetailScreen from './NotificationDetail';
 import DomainDetailScreen from './DomainDetail';
+import colors from '../../../components/colors';
 
 const Tab = createBottomTabNavigator();
 const NotificationsStack = createNativeStackNavigator();

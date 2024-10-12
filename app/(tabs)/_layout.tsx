@@ -9,6 +9,7 @@ import Animated, {
   interpolateColor,
   useDerivedValue,
 } from 'react-native-reanimated';
+import colors from '../../components/colors';
 
 const tabs = [
   { name: "(list)", title: "清单", icon: "list-outline" as const },
@@ -123,6 +124,7 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.white
   },
   tabBar: {
     flexDirection: 'row',

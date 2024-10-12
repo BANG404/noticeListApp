@@ -19,6 +19,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import TagEdit from "../../../components/tag_edit";
 import DomainSelect from "../../../components/domain_select";
+import CustomDateTimePicker from "../../../components/DateTimePicker";
+
 const customTheme = extendTheme({
   colors: {
     primary: {
@@ -53,6 +55,13 @@ const fetchDomains = async (query: string) => {
 const predefinedTags = ["重要", "紧急", "公告", "活动", "提醒"];
 
 export default function NotificationPublisherScreen() {
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [notification, setNotification] = useState({
+    content: "",
+    tags: [],
+    domain: "",
+    deadline: new Date(),
+  });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
@@ -76,6 +85,9 @@ export default function NotificationPublisherScreen() {
       setTags([...tags, newTag]);
       setNewTag("");
     }
+  };
+  const handleDateChange = (newDate) => {
+    setNotification((prev) => ({ ...prev, deadline: newDate }));
   };
 
   const handleSubmit = async () => {
@@ -142,7 +154,32 @@ export default function NotificationPublisherScreen() {
                 autoCompleteType={undefined}
               />
             </FormControl>
-
+            <FormControl>
+              <FormControl.Label
+                _text={{
+                  color: "coolGray.800",
+                  fontSize: "sm",
+                  fontWeight: 600,
+                }}
+              >
+                截止时间
+              </FormControl.Label>
+              <Pressable onPress={() => setShowDatePicker(true)}>
+                <Input
+                  value={notification.deadline.toLocaleString()}
+                  isReadOnly
+                  bg="white"
+                  borderColor="coolGray.200"
+                  _focus={{ borderColor: "primary.500", bg: "white" }}
+                />
+              </Pressable>
+              <CustomDateTimePicker
+                isOpen={showDatePicker}
+                onClose={() => setShowDatePicker(false)}
+                onConfirm={handleDateChange}
+                initialDate={notification.deadline}
+              />
+            </FormControl>
             <TagEdit
               tags={tags}
               selectedTags={selectedTags}
@@ -151,126 +188,7 @@ export default function NotificationPublisherScreen() {
               addNewTag={addNewTag}
               removeTag={removeTag}
             />
-            {/* <FormControl>
-              <FormControl.Label
-                _text={{ fontWeight: "bold", color: "primary.600" }}
-              >
-                标签
-              </FormControl.Label>
-              <HStack flexWrap="wrap" space={2} mb={2}>
-                {predefinedTags.map((tag) => (
-                  <Pressable
-                    key={tag}
-                    onPress={() => togglePredefinedTag(tag)}
-                    bg={tags.includes(tag) ? "primary.500" : "primary.100"}
-                    px={3}
-                    py={1}
-                    borderRadius="full"
-                  >
-                    <Text color={tags.includes(tag) ? "white" : "primary.600"}>
-                      {tag}
-                    </Text>
-                  </Pressable>
-                ))}
-              </HStack>
-              <HStack space={2} mb={2}>
-                <Input
-                  flex={1}
-                  placeholder="添加自定义标签"
-                  value={newTag}
-                  onChangeText={setNewTag}
-                  bg="white"
-                  borderColor="primary.100"
-                  _focus={{ borderColor: "primary.500" }}
-                />
-                <IconButton
-                  icon={<Ionicons name="add" size={24} color="white" />}
-                  onPress={addTag}
-                  bg="primary.600"
-                  _pressed={{ bg: "primary.500" }}
-                  borderRadius="full"
-                />
-              </HStack>
-              <HStack flexWrap="wrap" space={2}>
-                {tags.map((tag) => (
-                  <Pressable
-                    key={tag}
-                    onPress={() => removeTag(tag)}
-                    bg="primary.500"
-                    px={3}
-                    py={1}
-                    borderRadius="full"
-                    flexDirection="row"
-                    alignItems="center"
-                  >
-                    <Text color="white" mr={1}>
-                      {tag}
-                    </Text>
-                    <Ionicons name="close" size={16} color="white" />
-                  </Pressable>
-                ))}
-              </HStack>
-            </FormControl> */}
 
-            {/* <FormControl>
-              <FormControl.Label
-                _text={{ fontWeight: "bold", color: "primary.600" }}
-              >
-                发送域
-              </FormControl.Label>
-              <Input
-                placeholder="搜索发送域"
-                value={domainQuery}
-                onChangeText={setDomainQuery}
-                bg="white"
-                borderColor="primary.100"
-                _focus={{ borderColor: "primary.500" }}
-                mb={2}
-              />
-              <FlatList
-                data={availableDomains}
-                renderItem={({ item }) => (
-                  <Pressable
-                    onPress={() => toggleDomain(item.value)}
-                    bg={
-                      selectedDomains.includes(item.value)
-                        ? "primary.100"
-                        : "white"
-                    }
-                    p={2}
-                    mb={1}
-                    borderRadius="md"
-                  >
-                    <Text color="primary.600">{item.label}</Text>
-                  </Pressable>
-                )}
-                keyExtractor={(item) => item.value}
-                maxH={150}
-              />
-              <HStack flexWrap="wrap" space={2} mt={2}>
-                {selectedDomains.map((domain) => (
-                  <Pressable
-                    key={domain}
-                    onPress={() => toggleDomain(domain)}
-                    _pressed={{ opacity: 0.5 }}
-                  >
-                    <Box
-                      bg="primary.100"
-                      px={3}
-                      py={1}
-                      borderRadius="full"
-                      mb={2}
-                    >
-                      <Text color="primary.600">
-                        {availableDomains.find((d) => d.value === domain)
-                          ?.label || domain}{" "}
-                        ✕
-                      </Text>
-                    </Box>
-                  </Pressable>
-                ))}
-              </HStack>
-            </FormControl> */}
             <DomainSelect
               domainQuery={domainQuery}
               setDomainQuery={setDomainQuery}

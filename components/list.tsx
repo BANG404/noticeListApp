@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import {
   Box,
   FlatList,
@@ -24,36 +24,41 @@ interface ListItem {
   description: string;
   date: string;
   type: ItemType;
+  status: "待完成" | "过期" | "已完成";
 }
 
 const INITIAL_DATA: ListItem[] = [
   {
     id: "1",
-    title: "Complete project report",
-    description: "Finish the quarterly report for the team meeting",
+    title: "完成项目报告",
+    description: "为团队会议完成季度报告，包括所有项目进度和关键指标。",
     date: "2024/10/5",
     type: "task",
+    status: "待完成",
   },
   {
     id: "2",
-    title: "Team meeting",
-    description: "Discuss project progress and next steps",
+    title: "团队会议",
+    description: "讨论项目进展和下一步计划，准备好所有相关文档和演示材料。",
     date: "2024/10/5",
     type: "notification",
+    status: "待完成",
   },
   {
     id: "3",
-    title: "Code review",
-    description: "Review pull requests for the new feature",
+    title: "代码审查",
+    description: "审查新功能的拉取请求，确保代码质量和一致性。",
     date: "2024/10/5",
     type: "task",
+    status: "过期",
   },
   {
     id: "4",
-    title: "New message",
-    description: "John sent you a message about the client presentation",
+    title: "新消息",
+    description: "John 发送了关于客户演示的消息，请及时查看并回复。",
     date: "2024/10/5",
     type: "notification",
+    status: "已完成",
   },
 ];
 
@@ -61,9 +66,14 @@ const SWIPE_THRESHOLD = -100;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const ITEM_HEIGHT = 100;
 
-export default function TaskNotificationList() {
+export default function TaskNotificationList({ activeTab }) {
   const [listData, setListData] = useState<ListItem[]>(INITIAL_DATA);
+  const [filteredData, setFilteredData] = useState<ListItem[]>([]);
   const { colors } = useTheme();
+
+  useEffect(() => {
+    setFilteredData(listData.filter(item => item.status === activeTab));
+  }, [activeTab, listData]);
 
   const handleDelete = useCallback((id: string) => {
     setListData((prevData) => prevData.filter((item) => item.id !== id));
@@ -104,7 +114,7 @@ export default function TaskNotificationList() {
             style={[styles.itemContainer, { transform: [{ translateX }] }]}
           >
             <Box
-              bg={item.type === "task" ? colors.gray[800] : colors.gray[100]}
+              bg={item.type === "task" ? "#808080" : "white"}
               p={4}
               mb={2}
               rounded="lg"
@@ -116,13 +126,11 @@ export default function TaskNotificationList() {
                   as={Feather}
                   name={item.type === "task" ? "check-square" : "bell"}
                   size={6}
-                  color={item.type === "task" ? colors.white : colors.gray[800]}
+                  color={item.type === "task" ? "white" : "#808080"}
                 />
                 <VStack flex={1} justifyContent="space-between">
                   <Text
-                    color={
-                      item.type === "task" ? colors.white : colors.gray[800]
-                    }
+                    color={item.type === "task" ? "white" : "#808080"}
                     fontWeight="bold"
                     fontSize="md"
                     numberOfLines={1}
@@ -130,18 +138,14 @@ export default function TaskNotificationList() {
                     {item.title}
                   </Text>
                   <Text
-                    color={
-                      item.type === "task" ? colors.gray[300] : colors.gray[600]
-                    }
+                    color={item.type === "task" ? "white" : "#808080"}
                     fontSize="sm"
                     numberOfLines={2}
                   >
                     {item.description}
                   </Text>
                   <Text
-                    color={
-                      item.type === "task" ? colors.gray[400] : colors.gray[500]
-                    }
+                    color={item.type === "task" ? "white" : "#808080"}
                     fontSize="xs"
                   >
                     {item.date}
@@ -158,7 +162,7 @@ export default function TaskNotificationList() {
 
   return (
     <FlatList
-      data={listData}
+      data={filteredData}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.listContainer}

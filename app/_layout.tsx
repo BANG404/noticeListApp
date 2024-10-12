@@ -1,7 +1,9 @@
 import { Stack } from "expo-router/stack";
-import { NativeBaseProvider } from "native-base";
+import "./app.css";
 
 export default function Layout() {
+  // 定义主题色
+
   return (
     <Stack
       screenOptions={{

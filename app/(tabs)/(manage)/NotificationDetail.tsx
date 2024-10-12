@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Platform } from "react-native";
 import {
   NativeBaseProvider,
   extendTheme,
@@ -9,16 +10,12 @@ import {
   FormControl,
   TextArea,
   Input,
-  Button,
-  HStack,
-  Text,
-  Pressable,
-  Select,
-  CheckIcon,
+  Button, Text,
+  Pressable
 } from "native-base";
 import TagEdit from "../../../components/tag_edit";
 import DomainSelect from "../../../components/domain_select";
-import DeadlinePicker from "../../../components/deadLine";
+import CustomDateTimePicker from "../../../components/DateTimePicker";
 
 const customTheme = extendTheme({
   colors: {
@@ -38,9 +35,15 @@ const domains = [
   { value: "hr", label: "人力资源" },
   { value: "finance", label: "财务" },
 ];
-const [targetDate, setTargetDate] = useState(new Date()); // 确保初始值是有效的日期对象
 
 export default function NotificationPublisherScreen() {
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [notification, setNotification] = useState({
+    content: "",
+    tags: [],
+    domain: "",
+    deadline: new Date(),
+  });
   const [content, setContent] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDomain, setSelectedDomain] = useState("");
@@ -52,6 +55,22 @@ export default function NotificationPublisherScreen() {
     { value: string; label: string }[]
   >([]);
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const [showModal, setShowModal] = useState(false); // 添加状态管理
+  const onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || notification.deadline;
+    setShowDatePicker(Platform.OS === "ios");
+    setNotification((prev) => ({ ...prev, deadline: currentDate }));
+    console.log("选择的截止时间:", currentDate); // 添加调试信息
+  };
+  const handleDateChange = (newDate) => {
+    if (newDate) {
+      // 确保 newDate 是有效的
+      setNotification((prev) => ({ ...prev, deadline: newDate }));
+      console.log("截止时间已更新:", newDate); // 输出用户选择的截止时间
+    } else {
+      console.log("未选择有效的截止时间"); // 添加调试信息
+    }
+  };
   // 模拟从数据库获取域的函数
   const fetchDomains = async (query: string) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -116,7 +135,6 @@ export default function NotificationPublisherScreen() {
             <Heading size="xl" fontWeight="bold" color="primary.600">
               修改通知
             </Heading>
-
             <FormControl>
               <FormControl.Label
                 _text={{ fontWeight: "bold", color: "primary.600" }}
@@ -134,8 +152,41 @@ export default function NotificationPublisherScreen() {
                 autoCompleteType={undefined}
               />
             </FormControl>
+            <FormControl>
+              <FormControl.Label
+                _text={{
+                  color: "coolGray.800",
+                  fontSize: "sm",
+                  fontWeight: 600,
+                }}
+              >
+                截止时间
+              </FormControl.Label>
+              <Pressable onPress={() => { setShowModal(true); setShowDatePicker(true); }}>
+                <Input
+                  value={notification.deadline.toLocaleString()}
+                  isReadOnly
+                  bg="white"
+                  borderColor="coolGray.200"
+                  _focus={{ borderColor: "primary.500", bg: "white" }}
+                />
+              </Pressable>
+              </FormControl>
+              {/* 模型组件 */}
+              
+                  <CustomDateTimePicker
+                    isOpen={showModal}
+                    onClose={() => setShowModal(false)}
+                    onConfirm={(date) => {
+                      handleDateChange(date);
+                      setShowModal(false);
+                    }}
+                    initialDate={notification.deadline}
+                  />
+                
+              
+            
 
-            <DeadlinePicker value={targetDate} onChange={setTargetDate} />
             <TagEdit
               tags={tags}
               selectedTags={selectedTags}

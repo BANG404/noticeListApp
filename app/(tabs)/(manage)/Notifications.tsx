@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FlatList } from 'react-native';
-import { Box, Text, VStack, HStack, Spacer, IconButton, AddIcon, DeleteIcon, Pressable, Badge } from 'native-base';
+import { Box, Text, VStack, HStack, Spacer, IconButton, DeleteIcon, Pressable, Badge } from 'native-base';
 
 const initialNotifications = [
   { id: '1', name: 'John Doe', title: 'Mr.', content: 'Meeting at 2 PM', domain: 'Work', time: '2023-05-20 10:00', deadline: '2023-05-20 14:00', tag: 'Important' },
