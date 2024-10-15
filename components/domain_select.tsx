@@ -1,11 +1,11 @@
 import {
-    Box,
-    FlatList,
-    FormControl,
-    HStack,
-    Input,
-    Pressable,
-    Text,
+  Box,
+  FlatList,
+  FormControl,
+  HStack,
+  Input,
+  Pressable,
+  Text,
 } from "native-base";
 import React from "react";
 export default function DomainSelect({

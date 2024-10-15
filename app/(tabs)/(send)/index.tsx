@@ -20,6 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 import TagEdit from "../../../components/tag_edit";
 import DomainSelect from "../../../components/domain_select";
 import CustomDateTimePicker from "../../../components/DateTimePicker";
+import MarkdownEditor from "../../../components/markdownedite";
 
 const customTheme = extendTheme({
   colors: {
@@ -55,6 +56,7 @@ const fetchDomains = async (query: string) => {
 const predefinedTags = ["重要", "紧急", "公告", "活动", "提醒"];
 
 export default function NotificationPublisherScreen() {
+  const [markdownIsEdit, setMarkdownIsEdit] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [notification, setNotification] = useState({
     content: "",
@@ -143,15 +145,11 @@ export default function NotificationPublisherScreen() {
               >
                 通知内容
               </FormControl.Label>
-              <TextArea
-                h={32}
-                placeholder="输入通知内容"
-                value={content}
-                onChangeText={setContent}
-                bg="white"
-                borderColor="primary.100"
-                _focus={{ borderColor: "primary.500" }}
-                autoCompleteType={undefined}
+              <MarkdownEditor
+                markdownText={content}
+                setMarkdownText={setContent}
+                isEditing={markdownIsEdit}
+                setIsEditing={setMarkdownIsEdit}
               />
             </FormControl>
             <FormControl>

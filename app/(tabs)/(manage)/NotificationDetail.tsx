@@ -8,14 +8,15 @@ import {
   VStack,
   Heading,
   FormControl,
-  TextArea,
   Input,
-  Button, Text,
-  Pressable
+  Button,
+  Text,
+  Pressable,
 } from "native-base";
 import TagEdit from "../../../components/tag_edit";
 import DomainSelect from "../../../components/domain_select";
 import CustomDateTimePicker from "../../../components/DateTimePicker";
+import MarkdownEditor from "../../../components/markdownedite";
 
 const customTheme = extendTheme({
   colors: {
@@ -37,6 +38,7 @@ const domains = [
 ];
 
 export default function NotificationPublisherScreen() {
+  const [markdownIsEdit, setMarkdownIsEdit] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [notification, setNotification] = useState({
     content: "",
@@ -44,7 +46,7 @@ export default function NotificationPublisherScreen() {
     domain: "",
     deadline: new Date(),
   });
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState("# 通知内容");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDomain, setSelectedDomain] = useState("");
   const [selectedDeadline, setSelectedDeadline] = useState("");
@@ -60,7 +62,6 @@ export default function NotificationPublisherScreen() {
     const currentDate = selectedDate || notification.deadline;
     setShowDatePicker(Platform.OS === "ios");
     setNotification((prev) => ({ ...prev, deadline: currentDate }));
-    console.log("选择的截止时间:", currentDate); // 添加调试信息
   };
   const handleDateChange = (newDate) => {
     if (newDate) {
@@ -68,10 +69,9 @@ export default function NotificationPublisherScreen() {
       setNotification((prev) => ({ ...prev, deadline: newDate }));
       console.log("截止时间已更新:", newDate); // 输出用户选择的截止时间
     } else {
-      console.log("未选择有效的截止时间"); // 添加调试信息
     }
   };
-  // 模拟从数据库获取域的函数
+  // 模拟���数据库获取域的函数
   const fetchDomains = async (query: string) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const allDomains = [
@@ -108,7 +108,7 @@ export default function NotificationPublisherScreen() {
 
   const handleSubmit = async () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("通知已发布", `通知已成功发送到 ${selectedDomain} 域。`);
+    console.log("��知已发布", `通知已成功发送到 ${selectedDomain} 域。`);
     setContent("");
     setSelectedTags([]);
     setSelectedDomain("");
@@ -141,15 +141,11 @@ export default function NotificationPublisherScreen() {
               >
                 通知内容
               </FormControl.Label>
-              <TextArea
-                h={32}
-                placeholder="输入通知内容"
-                value={content}
-                onChangeText={setContent}
-                bg="white"
-                borderColor="primary.100"
-                _focus={{ borderColor: "primary.500" }}
-                autoCompleteType={undefined}
+              <MarkdownEditor
+                markdownText={content}
+                setMarkdownText={setContent}
+                isEditing={markdownIsEdit}
+                setIsEditing={setMarkdownIsEdit}
               />
             </FormControl>
             <FormControl>
@@ -162,7 +158,12 @@ export default function NotificationPublisherScreen() {
               >
                 截止时间
               </FormControl.Label>
-              <Pressable onPress={() => { setShowModal(true); setShowDatePicker(true); }}>
+              <Pressable
+                onPress={() => {
+                  setShowModal(true);
+                  setShowDatePicker(true);
+                }}
+              >
                 <Input
                   value={notification.deadline.toLocaleString()}
                   isReadOnly
@@ -171,22 +172,18 @@ export default function NotificationPublisherScreen() {
                   _focus={{ borderColor: "primary.500", bg: "white" }}
                 />
               </Pressable>
-              </FormControl>
-              {/* 模型组件 */}
-              
-                  <CustomDateTimePicker
-                    isOpen={showModal}
-                    onClose={() => setShowModal(false)}
-                    onConfirm={(date) => {
-                      handleDateChange(date);
-                      setShowModal(false);
-                    }}
-                    initialDate={notification.deadline}
-                  />
-                
-              
-            
+            </FormControl>
+            {/* 模型组件 */}
 
+            <CustomDateTimePicker
+              isOpen={showModal}
+              onClose={() => setShowModal(false)}
+              onConfirm={(date) => {
+                handleDateChange(date);
+                setShowModal(false);
+              }}
+              initialDate={notification.deadline}
+            />
             <TagEdit
               tags={tags}
               selectedTags={selectedTags}
