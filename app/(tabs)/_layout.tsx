@@ -5,6 +5,8 @@ import colors from "../../components/colors";
 import ListScreen from "./(list)/index";
 import SendScreen from "./(send)/index";
 import ManageScreen from "./(manage)/_layout";
+import ListItemDetail from "../../components/list_item_detail";
+import RequireAuth from '../../components/RequireAuth';
 
 const Tab = createBottomTabNavigator();
 
@@ -16,30 +18,32 @@ const tabs = [
 
 export default function TabLayout() {
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          const tab = tabs.find(t => t.name === route.name);
-          return <Ionicons name={tab?.icon} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: colors.black,
-        tabBarInactiveTintColor: colors.gray,
-        tabBarStyle: {
-          borderTopWidth: 1,
-          borderTopColor: "#E5E7EB",
-          height: 60,
-        },
-        headerShown: false,
-      })}
-    >
-      {tabs.map((tab) => (
-        <Tab.Screen
-          key={tab.name}
-          name={tab.name}
-          options={{ title: tab.title }}
-          component={tab.component}
-        />
-      ))}
-    </Tab.Navigator>
+    <RequireAuth>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            const tab = tabs.find(t => t.name === route.name);
+            return <Ionicons name={tab?.icon} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: colors.black,
+          tabBarInactiveTintColor: colors.gray,
+          tabBarStyle: {
+            borderTopWidth: 1,
+            borderTopColor: "#E5E7EB",
+            height: 60,
+          },
+          headerShown: false,
+        })}
+      >
+        {tabs.map((tab) => (
+          <Tab.Screen
+            key={tab.name}
+            name={tab.name}
+            options={{ title: tab.title }}
+            component={tab.component}
+          />
+        ))}
+      </Tab.Navigator>
+    </RequireAuth>
   );
 }

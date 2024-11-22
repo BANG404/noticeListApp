@@ -7,16 +7,11 @@ import {
   VStack,
   Heading,
   FormControl,
-  TextArea,
   Input,
   Button,
-  HStack,
-  Text,
   Pressable,
-  FlatList,
-  IconButton,
+  View,
 } from "native-base";
-import { Ionicons } from "@expo/vector-icons";
 import TagEdit from "../../../components/tag_edit";
 import DomainSelect from "../../../components/domain_select";
 import CustomDateTimePicker from "../../../components/DateTimePicker";

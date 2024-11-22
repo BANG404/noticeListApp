@@ -2,25 +2,45 @@ import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { Box, Text, VStack, HStack, Tag, Icon } from 'native-base';
 import { Feather } from '@expo/vector-icons';
+import { useRoute, RouteProp } from '@react-navigation/native';
 
-interface ListItemDetailProps {
-  item: {
-    id: string;
-    title: string;
-    description: string;
-    date: string;
-    type: 'task' | 'notification';
-    status: '待完成' | '过期' | '已完成';
-    senderName: string;
-    senderTitle: string;
-    domain: string;
-    publishTime: string;
-    deadline?: string;
-    tags?: string[];
-  };
+type ItemType = "task" | "notification";
+
+interface ListItem {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  type: ItemType;
+  status: "待完成" | "过期" | "已完成";
+  senderName: string;
+  senderTitle: string;
+  domain: string;
+  publishTime: string;
+  deadline?: string;
+  tags?: string[];
 }
 
-export default function ListItemDetail({ item }: ListItemDetailProps) {
+type RootStackParamList = {
+  ListItemDetail: { item: ListItem };
+};
+
+type ListItemDetailRouteProp = RouteProp<RootStackParamList, 'ListItemDetail'>;
+
+export default function ListItemDetail() {
+  const route = useRoute<ListItemDetailRouteProp>();
+  const { item } = route.params;
+
+  if (!item) {
+    return (
+      <ScrollView style={styles.container}>
+        <Box bg="white" p={4} rounded="lg" shadow={3}>
+          <Text>数据加载错误</Text>
+        </Box>
+      </ScrollView>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
       <Box bg="white" p={4} rounded="lg" shadow={3}>
